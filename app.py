@@ -53,13 +53,20 @@ Write a detailed, Google-friendly Amazon product review in clean HTML format. Fo
 Output format: Clean HTML.
 """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a professional product review writer."},
-            {"role": "user", "content": prompt}
-        ]
-    )
+import openai
+
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": f"Write a human tone, SEO optimized, EEAT compliant product review for this Amazon product: {product_url}"}
+    ]
+)
+
+review_html = response.choices[0].message.content
+
+
 
     return response.choices[0].message['content']
 
