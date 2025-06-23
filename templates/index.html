@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Amazon AI Review Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; background: #f4f4f4; }
+        input, button { width: 100%; padding: 12px; margin: 15px 0; border-radius: 5px; font-size: 16px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #output { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.1); white-space: pre-wrap; }
+        .loading { font-style: italic; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Amazon AI Review Generator</h1>
+    <input id="urlInput" type="text" placeholder="Paste Amazon Product URL here">
+    <button onclick="generateReview()">Generate Review</button>
+
+    <div id="output">
+        <p class="loading" id="loadingText"></p>
+    </div>
+
+    <script>
+        async function generateReview() {
+            const url = document.getElementById('urlInput').value.trim();
+            const output = document.getElementById('output');
+            const loadingText = document.getElementById('loadingText');
+
+            if (!url) {
+                alert('Please enter a valid Amazon product URL.');
+                return;
+            }
+
+            loadingText.textContent = 'Generating review... please wait...';
+            output.innerHTML = '';
+
+            try {
+                const res = await fetch('/generate-review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await res.json();
+
+                if (data.review_html) {
+                    output.innerHTML = data.review_html;
+                } else {
+                    output.innerHTML = '<p style="color:red;">Failed to generate review. Try again later.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                output.innerHTML = '<p style="color:red;">Error fetching review from server.</p>';
+            }
+
+            loadingText.textContent = '';
+        }
+    </script>
+</body>
+</html>
